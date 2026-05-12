@@ -1,0 +1,669 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400..600;1,400..600&display=swap');
+
+    :root {
+        --primary: #f7ad2f;
+        --primary-glow: rgba(247, 173, 47, 0.4);
+        --chrome: #a8a29e;
+        --dark-bg: #0f172a;
+        --glass: rgba(15, 23, 42, 0.7);
+        --glass-border: rgba(247, 173, 47, 0.2);
+    }
+
+    body {
+        background-color: #020617;
+        color: #fff;
+        overflow-x: hidden;
+    }
+
+    /* Fixed Background Elements */
+    .bg-animation-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    #world3d {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 1400px;
+        height: 100%;
+        perspective: 1500px;
+        opacity: 0.2;
+        z-index: 5;
+    }
+
+    #tablet {
+        width: 100%;
+        height: 200%;
+        /* Extended to ensure no hard edges during scroll */
+        background: radial-gradient(circle at center, #1e293b 0%, #020617 80%);
+        transform: rotateX(15deg) rotateY(-5deg);
+        transform-style: preserve-3d;
+        border: 1px solid var(--glass-border);
+        border-radius: 100px;
+        will-change: transform;
+    }
+
+    #svgPaths {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.8;
+        /* Increased base opacity */
+        filter: drop-shadow(0 0 10px var(--primary-glow));
+        /* Added glow to lines */
+    }
+
+    #path1,
+    #path2 {
+        stroke-width: 6;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 5px var(--primary));
+        stroke-dasharray: 100 200;
+        /* Fixed size segments and gaps */
+    }
+
+    .path-bike {
+        position: absolute;
+        width: 120px;
+        height: auto;
+        opacity: 0.5;
+        filter: drop-shadow(0 0 15px rgba(247, 173, 47, 0.8));
+        z-index: 2;
+    }
+
+    .bike-bottom {
+        transform: scaleY(-1);
+        /* Upside down */
+    }
+
+    /* Hero Section */
+    .hero {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 5%;
+        position: relative;
+    }
+
+    .hero-logo {
+        height: 350px;
+        filter: drop-shadow(0 0 40px var(--primary-glow));
+        margin-bottom: 2rem;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .hero-logo:hover {
+        transform: scale(1.05) rotate(-2deg);
+    }
+
+    .hero h1 {
+        font-family: 'Pirata One', system-ui;
+        font-size: clamp(3rem, 10vw, 7rem);
+        font-weight: 400;
+        margin-bottom: 1rem;
+        background: linear-gradient(180deg, #fff 30%, #f7ad2f 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 1.5px rgba(247, 173, 47, 0.4);
+        text-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        letter-spacing: 3px;
+    }
+
+    .hero p {
+        font-size: 1.5rem;
+        color: var(--chrome);
+        max-width: 700px;
+        margin-bottom: 3rem;
+    }
+
+    /* Scroll Sections */
+    .section-container {
+        padding: 10rem 5%;
+        width: 100%;
+        /* Ensure section occupies full width */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Center horizontally */
+        justify-content: center;
+        position: relative;
+    }
+
+    main.biker-main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        /* Occupy full width for background */
+        min-height: 4000px;
+        padding: 0px;
+        visibility: hidden;
+        overscroll-behavior: none;
+        overflow: visible;
+        will-change: transform;
+    }
+
+    /* Ultimate Magnetic WOW Buttons */
+    .btn-premium,
+    .btn-submit,
+    .btn-login,
+    .btn-primary {
+        position: relative;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 1.2rem 3.5rem;
+        background: rgba(247, 173, 47, 0.05) !important;
+        color: #fff !important;
+        font-size: 1.1rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-decoration: none !important;
+        border-radius: 12px;
+        border: 2px solid var(--primary) !important;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 0 15px rgba(247, 173, 47, 0.2);
+        backdrop-filter: blur(10px);
+        z-index: 100;
+        white-space: nowrap;
+    }
+
+    .btn-premium::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .btn-premium:hover::after {
+        opacity: 1;
+    }
+
+    .btn-premium:hover {
+        background: var(--primary) !important;
+        color: #000 !important;
+        transform: scale(1.05);
+        box-shadow: 0 0 40px var(--primary-glow), 0 0 100px rgba(247, 173, 47, 0.4);
+        border-color: #fff !important;
+    }
+
+    .btn-xl {
+        padding: 2rem 6rem !important;
+        font-size: 1.5rem !important;
+        border-radius: 20px !important;
+        letter-spacing: 5px;
+    }
+
+    /* Biker Cards Paired Layout */
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        /* Two columns for pairs */
+        gap: 4rem;
+        width: 100%;
+        max-width: 1100px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .biker-card {
+        width: 100%;
+        height: 600px;
+        position: relative;
+        border-radius: 40px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        cursor: pointer;
+        z-index: 5;
+    }
+
+    @media (max-width: 1024px) {
+        .cards-container {
+            grid-template-columns: 1fr;
+            gap: 4rem;
+        }
+
+        .biker-card {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+    }
+
+    .biker-card:hover {
+        transform: translateY(-20px) scale(1.02);
+        border-color: var(--primary);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 20px var(--primary-glow);
+    }
+
+    .card-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s ease;
+    }
+
+    .biker-card:hover .card-img {
+        transform: scale(1.1);
+    }
+
+    .card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.9) 80%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 3rem;
+    }
+
+    .card-overlay h3 {
+        color: var(--primary);
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        font-weight: 800;
+    }
+
+    .card-overlay p {
+        font-size: 1.1rem;
+        color: #e2e8f0;
+        line-height: 1.5;
+        opacity: 0.8;
+    }
+
+    /* Legacy Section */
+    .legacy-container {
+        max-width: 1000px;
+        width: 100%;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        padding: 5rem;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    .legacy-container h2 {
+        font-size: 3.5rem;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 2rem;
+    }
+
+    .legacy-text {
+        font-size: 1.3rem;
+        line-height: 1.8;
+        color: #cbd5e1;
+        margin-bottom: 4rem;
+    }
+
+    /* Table Design */
+    .table-box {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .biker-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .biker-table th {
+        background: var(--primary);
+        color: #000;
+        padding: 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .biker-table td {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    /* CTA Section */
+    .cta-banner {
+        width: 100%;
+        padding: 0rem 5%;
+        text-align: center;
+        border-top: 1px solid var(--glass-border);
+    }
+
+    .cta-banner h2 {
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 2rem;
+    }
+
+    .btn-xl {
+        padding: 1.5rem 4.5rem !important;
+        font-size: 1.4rem !important;
+    }
+
+    /* Cards Grid Restoration for Pairs */
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4rem;
+        width: 100%;
+        max-width: 1100px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .biker-card {
+        width: 100%;
+        height: 600px;
+        position: relative;
+        border-radius: 40px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        cursor: pointer;
+        z-index: 5;
+    }
+
+    @media (max-width: 1024px) {
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-animation-container">
+    <div id="world3d">
+        <div id="tablet"></div>
+    </div>
+    <svg id="svgPaths" viewBox="0 0 3000 1000" preserveAspectRatio="xMidYMid slice"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" xmlns="http://www.w3.org/2000/svg">
+        <path id="path1" d="M 0,200 Q 1500,500 3000,200" fill="none" stroke="none" />
+        <path id="path2" d="M 0,800 Q 1500,500 3000,800" fill="none" stroke="none" />
+    </svg>
+    <div class="bikes-wrapper"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);">
+        <!-- Top Bikes (Normal) -->
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-top" alt="Bike">
+
+        <!-- Bottom Bikes (Upside down) -->
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+        <img src="{% static 'images/bike_silhouette.png' %}" class="path-bike bike-bottom" alt="Bike">
+    </div>
+</div>
+
+<header class="hero">
+    <img src="{% static 'images/LOGO.png' %}" alt="Rocky Point MC" class="hero-logo reveal">
+    <h1 class="reveal">Rocky Point Riders Obregón</h1>
+    <p class="reveal">Hermandad, lealtad y el rugido de la libertad en el asfalto de Obregón.</p>
+</header>
+
+<section class="section-container">
+    <div class="cards-container">
+        <!-- Pair 1 -->
+        <div class="biker-card reveal" data-side="left">
+            <img src="{% static 'images/img1.jpeg' %}" class="card-img">
+            <div class="card-overlay">
+                <h3>La Hermandad</h3>
+                <p>Más que un club, somos una familia unida por la pasión. Aquí el respeto es la única moneda.</p>
+            </div>
+        </div>
+        <div class="biker-card reveal" data-side="right">
+            <img src="{% static 'images/img2.jpeg' %}" class="card-img">
+            <div class="card-overlay">
+                <h3>Potencia Pura</h3>
+                <p>Motores forjados para dominar el terreno. Cada revolución cuenta nuestra historia.</p>
+            </div>
+        </div>
+        <!-- Pair 2 -->
+        <div class="biker-card reveal" data-side="left">
+            <img src="{% static 'images/img3.jpeg' %}" class="card-img">
+            <div class="card-overlay">
+                <h3>Estilo & Cromo</h3>
+                <p>El cuero y el metal no son accesorios, son nuestra identidad en el camino.</p>
+            </div>
+        </div>
+        <div class="biker-card reveal" data-side="right">
+            <img src="{% static 'images/img4.jpeg' %}" class="card-img">
+            <div class="card-overlay">
+                <h3>La Ruta</h3>
+                <p>Desde el amanecer hasta el horizonte infinito, el camino es nuestro destino final.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-container">
+    <div class="legacy-container reveal">
+        <h2>Nuestro Legado</h2>
+        <p class="legacy-text">
+            Rocky Point MC nació de la pasión por el viento en la cara y el respeto por la máquina.
+            Somos un club forjado en la lealtad, donde cada miembro es un eslabón vital de nuestra cadena.
+            Desde nuestras primeras rodadas por Obregón hasta las grandes rutas nacionales,
+            mantenemos vivo el espíritu rebelde y la hermandad absoluta.
+        </p>
+
+        <div style="position: relative; border-radius: 20px; overflow: hidden; margin-bottom: 3rem;">
+            <img src="{% static 'images/img9.jpeg' %}"
+                style="width: 100%; height: 300px; object-fit: cover; opacity: 0.6;">
+            <div
+                style="position: absolute; inset: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: flex-end; padding: 2rem;">
+                <h4 style="font-size: 2rem; text-transform: uppercase; font-weight: 800;">Calendario Oficial</h4>
+            </div>
+        </div>
+
+        <div class="table-box">
+            <table class="biker-table">
+                <thead>
+                    <tr style="background: var(--primary); color: #000;">
+                        <th style="padding: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Evento</th>
+                        <th style="padding: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Fecha</th>
+                        <th style="padding: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Lugar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evento in eventos %}
+                    <tr>
+                        <td style="padding: 1.5rem; font-weight: 600;">{{ evento.nombre }}</td>
+                        <td style="padding: 1.5rem;">{{ evento.fecha }}</td>
+                        <td style="padding: 1.5rem; color: #94a3b8;">{{ evento.lugar }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 3rem; text-align: center; color: var(--gray);">No hay eventos
+                            programados próximamente.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner">
+    <h2 class="reveal">¿Quieres formar parte?</h2>
+    <p class="reveal" style="font-size: 1.4rem; color: var(--chrome); margin-bottom: 3rem;">
+        Si compartes nuestra pasión y respetas el código, contacta con un administrador del club.
+    </p>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
+<script>
+    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+    window.addEventListener('load', () => {
+        // Hero Entrance
+        const tl = gsap.timeline();
+        tl.to(".hero .reveal", {
+            autoAlpha: 1, // Use autoAlpha for better performance
+            y: 0,
+            duration: 1.2,
+            stagger: 0.2,
+            ease: "power4.out"
+        });
+
+        // 3D Parallax Background - optimized
+        gsap.to("#tablet", {
+            scrollTrigger: {
+                trigger: "body",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 0.5 // Smoother scrub
+            },
+            rotateX: -10,
+            y: -50
+        });
+
+        // Reveal sections on scroll - Paired side entrance
+        const reveals = document.querySelectorAll(".reveal");
+        reveals.forEach((el) => {
+            const side = el.getAttribute('data-side');
+            let startX = 0;
+            if (side === 'left') startX = -150;
+            if (side === 'right') startX = 150;
+
+            gsap.fromTo(el,
+                { autoAlpha: 0, x: startX, scale: 0.9 },
+                {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 90%",
+                        toggleActions: "play none none none"
+                    },
+                    autoAlpha: 1,
+                    x: 0,
+                    scale: 1,
+                    duration: 1.2,
+                    ease: "power3.out"
+                }
+            );
+        });
+
+        // SVG Path animation - Bikes riding the paths
+        const topBikes = document.querySelectorAll('.bike-top');
+        const bottomBikes = document.querySelectorAll('.bike-bottom');
+
+        // Normal bikes on top path
+        topBikes.forEach((bike, i) => {
+            gsap.to(bike, {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1
+                },
+                motionPath: {
+                    path: "#path1",
+                    align: "#path1",
+                    autoRotate: true,
+                    alignOrigin: [0.5, 0.5],
+                    start: i * 0.2,
+                    end: 1 + (i * 0.2)
+                },
+                ease: "none"
+            });
+        });
+
+        // Upside down bikes on bottom path
+        bottomBikes.forEach((bike, i) => {
+            gsap.to(bike, {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1
+                },
+                motionPath: {
+                    path: "#path2",
+                    align: "#path2",
+                    autoRotate: true,
+                    alignOrigin: [0.5, 0.5],
+                    start: i * 0.2,
+                    end: 1 + (i * 0.2)
+                },
+                ease: "none"
+            });
+        });
+
+        // Magnetic Button Effect
+        const magnets = document.querySelectorAll('.btn-premium, .btn-submit, .btn-login');
+        magnets.forEach((btn) => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                gsap.to(btn, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

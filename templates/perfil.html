@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container fade-in" style="max-width: 1200px; margin: 0 auto; padding: 4rem 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; border-bottom: 2px solid var(--primary); padding-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-family: 'Pirata One', cursive; font-size: 4rem; color: var(--primary); text-shadow: 0 0 20px rgba(247, 173, 47, 0.3); margin-bottom: 0;">Mi Perfil</h1>
+            <p style="color: var(--gray); font-size: 1.1rem; letter-spacing: 1px;">PERSONALIZA TU IDENTIDAD EN ROCKY POINT MC</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn-ghost">
+            <i class="fas fa-times"></i> Salir
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 350px 1fr; gap: 3rem;">
+        <!-- LADO IZQUIERDO: VISTA PREVIA -->
+        <div class="glass-card profile-sidebar" style="position: sticky; top: 2rem;">
+            <div class="profile-preview-wrapper">
+                <div class="profile-preview-container">
+                    {% if perfil.foto_perfil %}
+                        <img src="{{ perfil.foto_perfil.url }}" alt="Foto Perfil" id="profile-preview-img">
+                    {% else %}
+                        <div class="profile-placeholder" id="profile-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <img src="" alt="Foto Perfil" id="profile-preview-img" style="display: none;">
+                    {% endif %}
+                </div>
+                <div class="status-badge">
+                    {% if perfil.es_admin %}ADMIN{% else %}SOCIO{% endif %}
+                </div>
+            </div>
+            
+            <div class="profile-sidebar-info">
+                <h2 class="profile-display-name">{{ perfil.nombre_completo|default:user.username }}</h2>
+                <p class="profile-display-user">@{{ user.username }}</p>
+                
+                <div class="profile-meta-list">
+                    <div class="meta-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ user.email }}</span>
+                    </div>
+                    {% if perfil.telefono %}
+                    <div class="meta-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ perfil.telefono }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if perfil.descripcion %}
+                <div class="profile-sidebar-bio">
+                    <p>{{ perfil.descripcion }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- LADO DERECHO: FORMULARIO -->
+        <div class="glass-card profile-form-card">
+            <form method="post" enctype="multipart/form-data" class="premium-form">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h3 class="form-section-title">Información General</h3>
+                    <div class="form-grid">
+                        <div class="form-group-custom">
+                            <label for="id_nombre_completo">Nombre Completo</label>
+                            {{ form.nombre_completo }}
+                        </div>
+                        <div class="form-group-custom">
+                            <label for="id_telefono">Teléfono de Contacto</label>
+                            {{ form.telefono }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">Apariencia</h3>
+                    <div class="file-input-wrapper">
+                        <label for="id_foto_perfil" class="custom-file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Cambiar Foto de Perfil</span>
+                        </label>
+                        {{ form.foto_perfil }}
+                        <p class="file-hint">Formatos aceptados: JPG, PNG. Máx 2MB.</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">Sobre ti</h3>
+                    <div class="form-group-custom">
+                        <label for="id_descripcion">Biografía / Descripción</label>
+                        {{ form.descripcion }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-premium-large">
+                        <i class="fas fa-check-circle"></i> Actualizar Perfil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #f7ad2f;
+        --primary-glow: rgba(247, 173, 47, 0.4);
+        --glass: rgba(15, 23, 42, 0.8);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --gray: #94a3b8;
+    }
+
+    .profile-sidebar {
+        padding: 3rem 2rem;
+        border: 1px solid var(--primary);
+        background: linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,41,59,0.9) 100%);
+    }
+
+    .profile-preview-wrapper {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .profile-preview-container {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+        border-radius: 30px;
+        border: 2px solid var(--primary);
+        padding: 8px;
+        background: rgba(0,0,0,0.3);
+        box-shadow: 0 0 30px var(--primary-glow);
+        overflow: hidden;
+    }
+
+    .profile-preview-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 22px;
+    }
+
+    .status-badge {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: #000;
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 900;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .profile-display-name {
+        font-family: 'Pirata One', cursive;
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: 0.2rem;
+    }
+
+    .profile-display-user {
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--gray);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .meta-item i {
+        color: var(--primary);
+        width: 20px;
+    }
+
+    .profile-sidebar-bio {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--glass-border);
+        color: #cbd5e1;
+        font-style: italic;
+        line-height: 1.6;
+    }
+
+    /* Form Styling */
+    .profile-form-card {
+        padding: 3.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 3.5rem;
+    }
+
+    .form-section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--primary);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .form-section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--glass-border) 0%, transparent 100%);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .form-group-custom label {
+        display: block;
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+    }
+
+    .form-group-custom input, .form-group-custom textarea {
+        width: 100%;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--glass-border);
+        padding: 1.2rem;
+        border-radius: 15px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group-custom input:focus, .form-group-custom textarea:focus {
+        background: rgba(255,255,255,0.06);
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 20px rgba(247, 173, 47, 0.1);
+    }
+
+    /* Custom File Input */
+    .file-input-wrapper {
+        background: rgba(247, 173, 47, 0.03);
+        border: 2px dashed var(--glass-border);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    .file-input-wrapper:hover {
+        border-color: var(--primary);
+        background: rgba(247, 173, 47, 0.06);
+    }
+
+    #id_foto_perfil {
+        display: none;
+    }
+
+    .custom-file-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .custom-file-label i {
+        font-size: 3rem;
+        color: var(--primary);
+    }
+
+    .file-hint {
+        margin-top: 1rem;
+        color: var(--gray);
+        font-size: 0.8rem;
+    }
+
+    .btn-premium-large {
+        background: var(--primary);
+        color: #000;
+        border: none;
+        padding: 1.5rem 3rem;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        box-shadow: 0 10px 30px rgba(247, 173, 47, 0.3);
+    }
+
+    .btn-premium-large:hover {
+        transform: scale(1.02) translateY(-5px);
+        box-shadow: 0 15px 40px rgba(247, 173, 47, 0.4);
+    }
+
+    .btn-ghost {
+        color: var(--gray);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        transition: 0.3s;
+    }
+
+    .btn-ghost:hover {
+        color: #fff;
+    }
+    /* Hide default Django ClearableFileInput text */
+    .file-input-wrapper {
+        position: relative;
+    }
+
+    /* Style the 'Currently' section */
+    .file-input-wrapper br, 
+    .file-input-wrapper a {
+        display: none !important;
+    }
+
+    /* Target the text nodes 'Currently:', 'Change:', 'Clear' */
+    /* This is tricky with pure CSS, so we'll style the elements we can target */
+    
+    .file-input-wrapper input[type="checkbox"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary);
+        border-radius: 6px;
+        background: rgba(255,255,255,0.05);
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+
+    .file-input-wrapper input[type="checkbox"]:checked {
+        background: var(--primary);
+    }
+
+    .file-input-wrapper input[type="checkbox"]:checked::after {
+        content: "\f00d";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #000;
+        font-size: 12px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Container for the actions */
+    .file-input-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    .clear-photo-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: 0.3s;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .clear-photo-label:hover {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Hide the 'Modify:' label if it appears */
+    .file-input-wrapper label[for="foto_perfil-clear_id"] {
+        display: none;
+    }
+</style>
+
+<script>
+    // Preview image before upload
+    document.getElementById('id_foto_perfil').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.getElementById('profile-preview-img');
+                const placeholder = document.getElementById('profile-placeholder');
+                
+                img.src = event.target.result;
+                img.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle the 'Borrar' text by wrapping it if it exists
+    document.addEventListener('DOMContentLoaded', function() {
+        const wrapper = document.querySelector('.file-input-wrapper');
+        const checkbox = document.getElementById('foto_perfil-clear_id');
+        
+        if (checkbox) {
+            // Create a nice container for deletion
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'file-input-actions';
+            
+            const label = document.createElement('label');
+            label.className = 'clear-photo-label';
+            label.setAttribute('for', 'foto_perfil-clear_id');
+            label.innerHTML = '<i class="fas fa-trash-alt" style="margin-right: 8px;"></i> Eliminar foto actual';
+            
+            // Move checkbox into label or keep it and hide it
+            actionDiv.appendChild(label);
+            wrapper.appendChild(actionDiv);
+            
+            // Hide the text nodes (Currently, Change, Clear)
+            // We can do this by making the wrapper's text transparent and then making children opaque
+            wrapper.style.color = 'transparent';
+            const children = wrapper.querySelectorAll('*');
+            children.forEach(child => {
+                if (child.className !== 'file-hint') {
+                    child.style.color = ''; // Restore
+                } else {
+                    child.style.color = 'var(--gray)';
+                }
+            });
+            
+            // Specifically hide the 'Currently:' link text
+            const link = wrapper.querySelector('a');
+            if (link) link.style.display = 'none';
+        }
+    });
+</script>
+</div>
+{% endblock %}

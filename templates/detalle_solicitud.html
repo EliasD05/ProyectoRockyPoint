@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+            <h1 style="margin-bottom: 0.5rem;">Expediente de Inscripción</h1>
+            <p style="color: var(--gray);">ID #{{ solicitud.id }} | Enviado el {{ solicitud.fecha_creacion|date:"d M Y, H:i" }}</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'admin_dashboard' %}" class="btn-secondary">
+                <i class="fas fa-chevron-left"></i> Volver
+            </a>
+            <form action="{% url 'delete_solicitud' solicitud.id %}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta solicitud permanentemente?')" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-secondary" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            </form>
+            <a href="{% url 'admin_registro' %}?from_solicitud={{ solicitud.id }}&user={{ solicitud.nombres|slugify }}" class="btn-premium">
+                <i class="fas fa-user-check"></i> Registrar Usuario
+            </a>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;">
+        
+        <!-- SECCIÓN 1: DATOS PERSONALES -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-id-card"></i> Datos Personales</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Nombres</label>
+                    <p>{{ solicitud.nombres }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Apellidos</label>
+                    <p>{{ solicitud.apellidos }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Cédula</label>
+                    <p>{{ solicitud.cedula }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Sexo / Edad</label>
+                    <p>{{ solicitud.get_sexo_display }} / {{ solicitud.edad }} años</p>
+                </div>
+                <div class="info-item">
+                    <label>Fecha Nacimiento</label>
+                    <p>{{ solicitud.fecha_nacimiento|date:"d/m/Y" }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Lugar Nacimiento</label>
+                    <p>{{ solicitud.lugar_nacimiento }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: CONTACTO -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Contacto y Ubicación</h3>
+            <div class="info-grid">
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Dirección Residencia</label>
+                    <p>{{ solicitud.direccion }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Barrio / Ciudad</label>
+                    <p>{{ solicitud.barrio }}, {{ solicitud.ciudad }}</p>
+                </div>
+                <div class="info-item">
+                    <label>País / CP</label>
+                    <p>{{ solicitud.pais }} ({{ solicitud.codigo_postal }})</p>
+                </div>
+                <div class="info-item">
+                    <label>Teléfono Móvil</label>
+                    <p>{{ solicitud.telefono_movil }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Email Contacto</label>
+                    <p>{{ solicitud.email_contacto }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: PROFESIONAL Y DISCIPLINA -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-helmet-safety"></i> Deporte y Profesión</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Disciplina</label>
+                    <p class="accent-text">{{ solicitud.get_disciplina_display }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Ocupación</label>
+                    <p>{{ solicitud.ocupacion }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Teléfono Trabajo</label>
+                    <p>{{ solicitud.telefono_trabajo|default:"-" }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Email Trabajo</label>
+                    <p>{{ solicitud.email_trabajo|default:"-" }}</p>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Comentarios</label>
+                    <p style="font-style: italic; color: #94a3b8;">{{ solicitud.comentarios|default:"Sin comentarios adicionales." }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: SALUD -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-notes-medical"></i> Registro de Salud</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Grupo Sanguíneo</label>
+                    <p style="color: #ef4444; font-weight: 800; font-size: 1.4rem;">{{ solicitud.grupo_sanguineo }}</p>
+                </div>
+                <div class="info-item">
+                    <label>Seguro Médico</label>
+                    <p>{{ solicitud.seguro_medico|yesno:"Sí,No" }}{% if solicitud.seguro_especifique %} ({{ solicitud.seguro_especifique }}){% endif %}</p>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Alergias</label>
+                    <p>{{ solicitud.alergias|yesno:"Sí,No" }}{% if solicitud.alergias_especifique %} - {{ solicitud.alergias_especifique }}{% endif %}</p>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Padecimientos</label>
+                    <p>{{ solicitud.padecimientos|yesno:"Sí,No" }}{% if solicitud.padecimientos_especifique %} - {{ solicitud.padecimientos_especifique }}{% endif %}</p>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Tratamiento / Medicamentos</label>
+                    <p>
+                        Tratamiento: {{ solicitud.tratamiento_medico|yesno:"Sí,No" }}{% if solicitud.tratamiento_especifique %} ({{ solicitud.tratamiento_especifique }}){% endif %}<br>
+                        Toma Medicamento: {{ solicitud.toma_medicamento|yesno:"Sí,No" }}{% if solicitud.medicamento_forma_suministro %} ({{ solicitud.medicamento_forma_suministro }}){% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: VEHÍCULOS -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-motorcycle"></i> Vehículos</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Moto Principal</label>
+                    <p>{{ solicitud.moto_modelo }} ({{ solicitud.moto_placa }})</p>
+                </div>
+                <div class="info-item">
+                    <label>Vehículo de Apoyo</label>
+                    <p>{{ solicitud.vehiculo_modelo|default:"N/A" }} ({{ solicitud.vehiculo_placa|default:"N/A" }})</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVA SECCIÓN: DISPONIBILIDAD -->
+        <div class="glass-card" style="grid-column: span 2;">
+            <h3 class="section-title"><i class="fas fa-calendar-alt"></i> Horario de Disponibilidad</h3>
+            {% if solicitud.horario_entrenamiento %}
+                <div style="overflow-x: auto;">
+                    <table class="schedule-table-mini">
+                        <thead>
+                            <tr>
+                                <th>Horario</th>
+                                <th>Lun</th>
+                                <th>Mar</th>
+                                <th>Mié</th>
+                                <th>Jue</th>
+                                <th>Vie</th>
+                                <th>Sáb</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hour, days in solicitud.horario_entrenamiento.items %}
+                            <tr>
+                                <td style="font-size: 0.7rem; color: var(--gray); white-space: nowrap;">{{ hour }}</td>
+                                {% for day, value in days.items %}
+                                    <td style="text-align: center;">
+                                        {% if value == 'disponible' %}
+                                            <span style="display: inline-block; width: 12px; height: 12px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);" title="Disponible"></span>
+                                        {% else %}
+                                            <span style="display: inline-block; width: 12px; height: 12px; background: rgba(255,255,255,0.05); border-radius: 50%;" title="No Disponible"></span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p style="color: var(--gray); font-style: italic;">No se registró horario de disponibilidad.</p>
+            {% endif %}
+        </div>
+
+        <!-- SECCIÓN 6: EMERGENCIAS -->
+        <div class="glass-card">
+            <h3 class="section-title"><i class="fas fa-ambulance"></i> Contactos de Emergencia</h3>
+            <div class="info-grid">
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Contacto Principal</label>
+                    <p style="font-weight: 700;">{{ solicitud.emergencia_nombres }} {{ solicitud.emergencia_apellidos }} ({{ solicitud.emergencia_parentesco }})</p>
+                    <p class="accent-text">{{ solicitud.emergencia_codigo_tel }} {{ solicitud.emergencia_telefono }}</p>
+                    <p style="font-size: 0.85rem; color: var(--gray);">{{ solicitud.emergencia_direccion }}, {{ solicitud.emergencia_barrio }}, {{ solicitud.emergencia_ciudad }}</p>
+                </div>
+                <hr style="grid-column: span 2; border: 0; border-top: 1px solid var(--glass-border); margin: 0.5rem 0;">
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Contacto Secundario</label>
+                    <p>{{ solicitud.emergencia2_nombres }} {{ solicitud.emergencia2_apellidos }}</p>
+                    <p class="accent-text">{{ solicitud.emergencia2_codigo_tel }} {{ solicitud.emergencia2_telefono }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 7: DOCUMENTOS Y FIRMA -->
+        <div class="glass-card" style="grid-column: span 2;">
+            <h3 class="section-title"><i class="fas fa-file-contract"></i> Documentación y Soporte</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                <div>
+                    <label class="doc-label">Documentos Vehículo</label>
+                    {% if solicitud.documentos_vehiculo %}
+                        <a href="{{ solicitud.documentos_vehiculo.url }}" class="file-btn" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Ver Archivo
+                        </a>
+                    {% else %}
+                        <p class="no-data">No adjunto</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="doc-label">Foto Identificación</label>
+                    {% if solicitud.foto_identificacion %}
+                        <a href="{{ solicitud.foto_identificacion.url }}" class="file-btn" target="_blank">
+                            <i class="fas fa-id-badge"></i> Ver Imagen
+                        </a>
+                    {% else %}
+                        <p class="no-data">No adjunto</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="doc-label">Firma de Conformidad</label>
+                    {% if solicitud.firma_conformidad %}
+                        <div class="signature-display">
+                            <img src="{{ solicitud.firma_conformidad }}" alt="Firma">
+                        </div>
+                    {% else %}
+                        <p class="no-data">Pendiente de firma</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="legal-summary">
+                <div class="legal-item {% if solicitud.acepta_responsabilidad %}status-ok{% else %}status-err{% endif %}">
+                    <i class="fas fa-{% if solicitud.acepta_responsabilidad %}check{% else %}times{% endif %}-circle"></i> Responsabilidad
+                </div>
+                <div class="legal-item {% if solicitud.acepta_privacidad %}status-ok{% else %}status-err{% endif %}">
+                    <i class="fas fa-{% if solicitud.acepta_privacidad %}check{% else %}times{% endif %}-circle"></i> Privacidad
+                </div>
+                <div class="legal-item {% if solicitud.acepta_fotografias %}status-ok{% else %}status-err{% endif %}">
+                    <i class="fas fa-{% if solicitud.acepta_fotografias %}check{% else %}times{% endif %}-circle"></i> Fotografías
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .section-title {
+        color: var(--primary);
+        font-family: 'Pirata One', cursive;
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 1rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .info-item label {
+        display: block;
+        color: var(--gray);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-item p {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .accent-text {
+        color: var(--primary) !important;
+        font-weight: 700 !important;
+    }
+
+    .doc-label {
+        display: block;
+        color: var(--gray);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        margin-bottom: 0.8rem;
+    }
+
+    .file-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        padding: 1rem;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .file-btn:hover {
+        background: var(--primary);
+        color: #000;
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    .no-data {
+        color: var(--gray);
+        font-style: italic;
+        margin-top: 0.5rem;
+    }
+
+    .signature-display {
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .signature-display img {
+        max-width: 100%;
+        max-height: 100%;
+        filter: invert(1);
+    }
+
+    .legal-summary {
+        margin-top: 3rem;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        display: flex;
+        justify-content: space-around;
+        border: 1px solid var(--glass-border);
+    }
+
+    .legal-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .status-ok { color: #10b981; }
+    .status-err { color: #ef4444; }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        padding: 0.8rem 1.5rem;
+        border-radius: 100px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #fff;
+    }
+
+    .schedule-table-mini {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 1rem;
+    }
+    .schedule-table-mini th {
+        color: var(--primary);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 0.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .schedule-table-mini td {
+        padding: 0.6rem 0.4rem;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block encabezado %}
+{% if perms.mi_aplicacion.add_maestro %}
+<a href="{% url 'usuario_alta' %}"><img src="{%static 'images/icons8-plus-32.png' %}"></a>
+{% endif %}
+{% endblock %}
+
+{% block filtros %}
+
+{% endblock %}
+
+{% block contenido %}
+<table class="w3-table-all w3-hoverable">
+  <thead>
+    <tr class="w3-dark-grey">
+      <th>Acciones</th>
+      <th>username</th>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Activo</th>
+    </tr>
+  </thead>
+  {% for usuario in usuarios %}
+  <tr>
+    <td>
+      {% if perms.mi_aplicacion.delete_maestro %}
+      <a href="{% url 'usuario_eliminar' usuario.id %}"><img src="{%static 'images/icons8-trash-can-32.png' %}"></a>
+      {% endif %}
+      {% if perms.mi_aplicacion.change_maestro %}
+      <a href="{% url 'usuario_editar' usuario.id %}"><img src="{%static 'images/icons8-edit-pencil-32.png' %}"></a>
+      {% endif %}
+    </td>
+    <td>{{ usuario.username }}</td>
+    <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+    <td>{{ usuario.email }}</td>
+    <td>{% if usuario.is_active %}Sí{% else %}No{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

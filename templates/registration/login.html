@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block contenido %}   
+<div class="w3-container w3-teal w3-margin-top w3-margin-bottom">
+  <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="w3-button w3-teal">Login</button>
+    </form>
+</div>
+{% endblock %}  

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block encabezado %}
+{% if perms.mi_aplicacion.add_maestro %}
+<a href="{% url 'maestros_alta' %}"><img src="{%static 'images/icons8-plus-32.png' %}"></a>
+{% endif %}
+{% endblock %}
+
+{% block filtros %}
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="nombre" placeholder="Nombre" value="{{ request.GET.nombre }}">
+  <select name="escuela">
+    <option value="0">Todas las escuelas</option>
+    {% for escuela in escuelas %}
+    <option value="{{ escuela.id }}" 
+    {% if request.GET.escuela == escuela.id|stringformat:"s" %}selected{% endif %}
+    >{{ escuela.siglas }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+{% endblock %}
+
+{% block contenido %}
+  <table class="w3-table-all w3-hoverable">
+    <thead>
+      <tr class="w3-dark-grey">
+        <th>Acciones</th>
+        <th>Nombre</th>
+        <th>Escuela</th>
+        <th>Sexo</th>
+        <th>Fecha de Nacimiento</th>
+      </tr>
+    </thead>
+    {% for maestro in maestros %}
+    <tr>
+      <td>
+        {% if perms.mi_aplicacion.delete_maestro %}
+        <a href="{% url 'maestros_eliminar' maestro.id %}"><img src="{%static 'images/icons8-trash-can-32.png' %}"></a>
+        {% endif %}
+        {% if perms.mi_aplicacion.change_maestro %} 
+        <a href="{% url 'maestros_editar' maestro.id %}"><img src="{%static 'images/icons8-edit-pencil-32.png' %}"></a>
+        {% endif %}
+      </td>
+      <td>{{ maestro.nombre }}</td>
+      <td>{{ maestro.escuela.siglas }}</td>
+      <td>
+        {% if maestro.sexo == 2 %}Hombre{% elif maestro.sexo == 1 %}Mujer{% else %}Prefiero no decirlo{% endif %}
+      </td>
+      <td>{{ maestro.fecha_nacimiento }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

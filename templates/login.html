@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container fade-in" style="max-width: 500px;">
+    <div class="glass-card" style="margin-top: 5rem;">
+        <h2 style="text-align: center; font-size: 2rem;">Iniciar Sesión</h2>
+        <p style="text-align: center; color: var(--gray); margin-bottom: 3rem;">Acceso exclusivo para integrantes</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" name="username" id="username" placeholder="Tu nombre de usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" name="password" id="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="btn-login" style="width: 100%; margin-top: 1rem; padding: 1rem;">Entrar al Club</button>
+        </form>
+        
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{% url 'registro' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">¿No eres miembro? Solicita tu ingreso</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocky Point - Obregón | Club de Motociclismo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Pirata+One&display=swap"
+        rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+    <style>
+        .nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px !important;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0 5px;
+        }
+
+        .nav-avatar-container {
+            width: 24px !important;
+            height: 24px !important;
+            min-width: 24px !important;
+            min-height: 24px !important;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .nav-avatar {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+        }
+
+        .nav-profile span {
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="loader-container">
+            <img src="{% static 'images/LOGO.png' %}" alt="Loading..." class="loader-logo">
+            <div class="loader-orbit orbit-1"></div>
+            <div class="loader-orbit orbit-2"></div>
+        </div>
+    </div>
+
+    <!-- Floating Glass Navbar -->
+    <header class="navbar-spacer"></header>
+    <nav class="glass-navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="{% url 'home' %}" class="nav-brand">
+                <img src="{% static 'images/LOGO.png' %}" alt="Rocky Point MC">
+            </a>
+            <div class="nav-menu">
+                <div class="nav-indicator"></div>
+                <a href="{% url 'home' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'miembros' %}"
+                    class="nav-link {% if request.resolver_match.url_name == 'miembros' %}active{% endif %}">
+                    <span>Miembros</span>
+                </a>
+                {% if user.is_authenticated %}
+                {% if user.perfilmiembro.es_admin %}
+                <a href="{% url 'admin_dashboard' %}"
+                    class="nav-link nav-link--accent {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                    <span>Dashboard</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'perfil' %}" class="nav-link nav-profile">
+                    <div class="nav-avatar-container">
+                        {% if user.perfilmiembro.foto_perfil %}
+                            <img src="{{ user.perfilmiembro.foto_perfil.url }}" alt="Avatar" class="nav-avatar">
+                        {% else %}
+                            <i class="fas fa-user-circle"></i>
+                        {% endif %}
+                    </div>
+                    <span>{% if user.perfilmiembro.nombre_completo %}{{ user.perfilmiembro.nombre_completo }}{% else %}{{ user.username }}{% endif %}</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-link nav-link--ghost">
+                    <span>Salir</span>
+                </a>
+                {% else %}
+                <a href="{% url 'custom_login' %}"
+                    class="nav-link nav-link--cta {% if request.resolver_match.url_name == 'custom_login' %}active{% endif %}">
+                    <span>Iniciar Sesión</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Liquid Gooey Filter -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+        <defs>
+            <filter id="liquid-goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+                    result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
+
+    {% if messages %}
+    <div class="container" style="margin-bottom: 0;">
+        {% for message in messages %}
+        <div class="glass-card message-card {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="glass-footer">
+        <div class="footer-liquid-wave"></div>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <img src="{% static 'images/LOGO.png' %}" alt="Rocky Point MC"
+                    style="height: 80px; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.3));">
+                <p>El club de motociclismo líder en Ciudad Obregón. Pasión, disciplina y comunidad sobre dos ruedas.
+                    Únete a la familia Rocky Point.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/rockypointobregon/" class="social-icon" title="Facebook"><i
+                            class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon" title="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Navegación</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'miembros' %}">Miembros</a></li>
+                    <li><a href="{% url 'custom_login' %}">Mi Cuenta</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>El Club</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Historia</a></li>
+                    <li><a href="#">Reglamento</a></li>
+                    <li><a href="#">Eventos</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto</h4>
+                <ul class="footer-links" style="color: var(--gray); font-size: 0.9rem;">
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-location-dot"
+                            style="color: var(--primary); margin-right: 0.8rem; width: 15px;"></i> Cd. Obregón, Sonora,
+                        México</li>
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-envelope"
+                            style="color: var(--primary); margin-right: 0.8rem; width: 15px;"></i> [EMAIL_ADDRESS]</li>
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-phone"
+                            style="color: var(--primary); margin-right: 0.8rem; width: 15px;"></i> +52 1 644 145 3165
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Rocky Point MC - Todos los derechos reservados. Diseñado para la comunidad motorista.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // Global Scroll to Top
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        // ═══ Liquid Navbar Logic ═══
+        const navbar = document.getElementById('mainNav');
+        const navMenu = document.querySelector('.nav-menu');
+        const indicator = document.querySelector('.nav-indicator');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function moveIndicator(el) {
+            if (!el || !indicator) return;
+            const rect = el.getBoundingClientRect();
+            const parentRect = navMenu.getBoundingClientRect();
+
+            gsap.to(indicator, {
+                left: rect.left - parentRect.left,
+                width: rect.width,
+                duration: 0.6,
+                ease: "power3.out"
+            });
+        }
+
+        // Initialize indicator position
+        const activeLink = document.querySelector('.nav-link.active');
+        if (activeLink) {
+            setTimeout(() => moveIndicator(activeLink), 100);
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', () => moveIndicator(link));
+        });
+
+        navMenu.addEventListener('mouseleave', () => {
+            if (activeLink) moveIndicator(activeLink);
+        });
+
+        if (navbar) {
+            // Scroll state toggle
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // Preloader dismiss
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+            }, 500); // Small delay for smooth transition
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

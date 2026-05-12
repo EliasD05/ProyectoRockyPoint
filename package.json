@@ -1,0 +1,10 @@
+{
+  "name": "proyecto-django",
+  "version": "1.0.0",
+  "scripts": {
+    "vercel-build": "python manage.py collectstatic --noinput"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

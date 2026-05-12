@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container fade-in">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 0.5rem; color: var(--light);">CLUB DE MOTOCICLISMO</h1>
+        <p style="color: var(--primary); font-size: 1.5rem; letter-spacing: 2px; font-weight: 700;">"Rocky Point -
+            Obregón"</p>
+        <div style="width: 100px; height: 4px; background: var(--primary); margin: 2rem auto;"></div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="solicitud-form">
+        {% csrf_token %}
+
+        <!-- DATOS PERSONALES -->
+        <div class="glass-card section-card">
+            <div class="section-header">DATOS PERSONALES</div>
+            <div class="row">
+                <div class="col-md-6">{{ form.nombres|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.apellidos|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">{{ form.cedula|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.sexo|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.edad|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form.fecha_nacimiento|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.lugar_nacimiento|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- DATOS CONTACTO -->
+        <div class="glass-card section-card">
+            <div class="section-header">DATOS CONTACTO</div>
+            {{ form.direccion|as_crispy_field }}
+            <div class="row">
+                <div class="col-md-4">{{ form.barrio|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.ciudad|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.pais|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.codigo_postal|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.telefono_habitacion|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.telefono_movil|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.email_contacto|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- DATOS PROFESIONALES / LABORALES -->
+        <div class="glass-card section-card">
+            <div class="section-header">DATOS PROFESIONALES / LABORALES</div>
+            <div class="row">
+                <div class="col-md-4">{{ form.ocupacion|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.telefono_trabajo|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.email_trabajo|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- INFORMACIÓN O CATEGORIA DE LA DISCIPLINA -->
+        <div class="glass-card section-card">
+            <div class="section-header">INFORMACIÓN O CATEGORIA DE LA DISCIPLINA</div>
+            <div class="row">
+                <div class="col-md-6">{{ form.disciplina|as_crispy_field }}</div>
+            </div>
+            {{ form.comentarios|as_crispy_field }}
+
+            <div class="fieldset-title" style="margin: 2rem 0 1.5rem 0; font-size: 1.2rem; color: var(--primary);">
+                Horario de Disponibilidad</div>
+            <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem;">Indica los bloques horarios en los que estarías disponible para actividades del club.</p>
+            <div style="overflow-x: auto; margin-bottom: 1rem;">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Horario</th>
+                            {% for day in days %}
+                            <th>{{ day }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hour in hours %}
+                        <tr>
+                            <td class="hour-label">{{ hour }}</td>
+                            {% for day in days %}
+                            <td>
+                                <select name="schedule_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"
+                                    class="schedule-select availability-select">
+                                    <option value="no_disponible" selected>No Disponible</option>
+                                    <option value="disponible">Disponible</option>
+                                </select>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <style>
+                .availability-select {
+                    transition: all 0.3s ease;
+                }
+                .availability-select option[value="disponible"] {
+                    color: #10b981;
+                }
+                .availability-select option[value="no_disponible"] {
+                    color: #ef4444;
+                }
+                .availability-select:has(option[value="disponible"]:checked) {
+                    border-color: #10b981 !important;
+                    color: #10b981 !important;
+                }
+            </style>
+        </div>
+
+        <!-- REGISTRO DE SALUD -->
+        <div class="glass-card section-card">
+            <div class="section-header">REGISTRO DE SALUD</div>
+            <div class="row">
+                <div class="col-md-4">{{ form.grupo_sanguineo|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.alergias|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.alergias_especifique|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.padecimientos|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.padecimientos_especifique|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.tratamiento_medico|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.tratamiento_especifique|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.toma_medicamento|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.medicamento_forma_suministro|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.seguro_medico|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.seguro_especifique|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- INFORMACIÓN PARA CASOS DE EMERGENCIA -->
+        <div class="glass-card section-card">
+            <div class="section-header">INFORMACIÓN PARA CASOS DE EMERGENCIA</div>
+            <p style="color: var(--gray); margin-bottom: 1.5rem;">Persona de contacto principal en caso de emergencia.
+            </p>
+            <div class="row">
+                <div class="col-md-6">{{ form.emergencia_nombres|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.emergencia_apellidos|as_crispy_field }}</div>
+            </div>
+            {{ form.emergencia_parentesco|as_crispy_field }}
+            {{ form.emergencia_direccion|as_crispy_field }}
+            <div class="row">
+                <div class="col-md-4">{{ form.emergencia_barrio|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.emergencia_ciudad|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.emergencia_pais|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.emergencia_codigo_tel|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.emergencia_telefono|as_crispy_field }}</div>
+            </div>
+            <hr style="border-color: var(--glass-border); margin: 2.5rem 0;">
+            <p style="color: var(--gray); margin-bottom: 1.5rem;">Segunda persona de contacto alternativa.</p>
+            <div class="row">
+                <div class="col-md-6">{{ form.emergencia2_nombres|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.emergencia2_apellidos|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">{{ form.emergencia2_codigo_tel|as_crispy_field }}</div>
+                <div class="col-md-9">{{ form.emergencia2_telefono|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- MOTO O VEHICULO -->
+        <div class="glass-card section-card">
+            <div class="section-header">MOTO O VEHICULO</div>
+            <div class="row">
+                <div class="col-md-6">{{ form.vehiculo_modelo|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.vehiculo_placa|as_crispy_field }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">{{ form.moto_modelo|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.moto_placa|as_crispy_field }}</div>
+            </div>
+        </div>
+
+        <!-- DOCUMENTOS Y SOPORTES DEL VEHICULO -->
+        <div class="glass-card section-card">
+            <div class="section-header">DOCUMENTOS Y SOPORTES DEL VEHICULO</div>
+            <p style="color: var(--gray); margin-bottom: 1rem;">* Tarjeta de Propiedad * SOAT * Revisión Técnicomecánica
+                * Manifiesto de Importación</p>
+            <p style="color: var(--gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Tipos de Archivos aceptados: pdf,
+                jpg, jpeg, png</p>
+            {{ form.documentos_vehiculo|as_crispy_field }}
+            {{ form.foto_identificacion|as_crispy_field }}
+        </div>
+
+        <!-- ASPECTO LEGAL -->
+        <div class="glass-card section-card">
+            <div class="section-header">ASPECTO LEGAL</div>
+
+            <div class="legal-box">
+                <h4>Liberación de Responsabilidad Social</h4>
+                <p>
+                    Yo, portador de la cédula de identidad, declaro que conozco todos los riesgos que involucran las
+                    actividades deportivas a motor y que haré uso correcto de las instalaciones autorizadas para la
+                    práctica deportiva bajo mi única responsabilidad. Así mismo declaro que exonero de toda
+                    responsabilidad Penal, Civil o Administrativa a la empresa ROCKY POINT MC y a las autoridades
+                    locales por hechos u accidentes ocurridos antes, durante y después de la práctica deportiva o
+                    recreativa que realice.<br><br>
+                    Por último, doy autorización para mi traslado a la clínica u hospital más cercano, en caso de
+                    presentarse algún accidente y autorizo a los médicos a atenderme debidamente.
+                </p>
+            </div>
+            {{ form.acepta_responsabilidad|as_crispy_field }}
+
+            <div class="legal-box">
+                <h4>Aceptación Tratamiento de Datos</h4>
+                <p>
+                    Yo, portador de la cédula de identidad, autorizo a "ROCKY POINT MC", a que conserven en ficheros
+                    informáticos y/o en cualquier otro soporte físico los datos personales que le han sido
+                    proporcionados de forma voluntaria y a tratar esa información con el objeto que le han sido
+                    facilitados, es decir, para la administración y gestión. Asimismo, el firmante declara conocer y
+                    aceptar las normas generales de funcionamiento del Club de Motociclismo, de las actividades y
+                    aquellas genéricas de funcionamiento. Por su parte "ROCKY POINT MC" informa al firmante que su
+                    información personal figura en sus oficinas, en las que podrá solicitar el contenido exacto de ella
+                    y en donde podrá ejercer los derechos de rectificación, anulación o modificación que pudiera
+                    corresponderle, así como modificar esta autorización en cualquier sentido.
+                </p>
+            </div>
+            {{ form.acepta_privacidad|as_crispy_field }}
+
+            <div class="legal-box">
+                <h4>Permiso de Fotografías</h4>
+                <p>
+                    Yo, portador de la cédula de identidad, declaro y autorizo a que "ROCKY POINT MC", pueda realizar
+                    fotografías durante las actividades, para su posible utilización en medios de comunicación, redes
+                    sociales, soportes informáticos o exhibición en otros medios del centro.
+                </p>
+            </div>
+            {{ form.acepta_fotografias|as_crispy_field }}
+
+            <!-- Firma de Conformidad -->
+            <div style="margin-top: 3rem;">
+                <div class="fieldset-title" style="color: var(--primary); font-size: 1.2rem; margin-bottom: 1rem;">Firma
+                    de Conformidad del Proceso de Inscripción</div>
+                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Dibuja tu firma en el recuadro o sube una imagen de tu firma.
+                </p>
+
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <button type="button" id="btn-draw" class="btn-login"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.85rem;" onclick="showCanvas()">✏️ Dibujar
+                        Firma</button>
+                    <button type="button" id="btn-upload" class="btn-login"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.85rem; background: var(--dark-lighter); border: 1px solid var(--glass-border);"
+                        onclick="showUpload()">📎 Subir Imagen</button>
+                    <button type="button" id="btn-clear" class="btn-login"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--glass-border); display: none;"
+                        onclick="clearCanvas()">🗑️ Limpiar</button>
+                </div>
+
+                <div id="canvas-container" style="display: block;">
+                    <canvas id="firma-canvas" width="600" height="200"
+                        style="border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.03); cursor: crosshair; max-width: 100%; touch-action: none;">
+                    </canvas>
+                </div>
+
+                <div id="upload-container" style="display: none;">
+                    <input type="file" name="firma_imagen" accept="image/*"
+                        style="padding: 1rem; background: rgba(255,255,255,0.05); border: 1px dashed var(--glass-border); border-radius: 12px; width: 100%;">
+                </div>
+
+                <input type="hidden" name="firma_data" id="firma-data">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 5rem;">
+            <button type="submit" class="btn-login"
+                style="width: 100%; padding: 1.5rem; font-size: 1.2rem; box-shadow: var(--shadow);">Enviar Solicitud
+                Completa</button>
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <p style="color: var(--gray); font-size: 0.9rem;">
+                    * Al enviar esta solicitud, confirmas que todos los datos proporcionados son verídicos y aceptas los
+                    reglamentos internos del club.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-card {
+        margin-bottom: 3rem;
+        padding: 2.5rem !important;
+    }
+
+    .section-header {
+        font-family: 'Pirata One', system-ui;
+        font-size: 2rem;
+        font-weight: 400;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 2.5rem;
+        border-bottom: 2px solid var(--glass-border);
+        padding-bottom: 1rem;
+    }
+
+    .legal-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+    }
+
+    .legal-box h4 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .legal-box p {
+        color: var(--gray);
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .asteriskField {
+        color: var(--primary);
+    }
+
+    /* Estilos para Crispy en tema oscuro */
+    .form-control,
+    .form-select {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid var(--glass-border) !important;
+        color: var(--light) !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 10px rgba(247, 173, 47, 0.2) !important;
+    }
+
+    label {
+        color: var(--gray) !important;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ═══ Signature Canvas Logic ═══
+    const canvas = document.getElementById('firma-canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    ctx.strokeStyle = '#f7ad2f';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+    }
+
+    function startDrawing(e) {
+        drawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        // Show clear button when starting to draw
+        document.getElementById('btn-clear').style.display = 'inline-flex';
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    }
+
+    function stopDrawing() { drawing = false; }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+    canvas.addEventListener('touchend', stopDrawing);
+
+    function showCanvas() {
+        document.getElementById('canvas-container').style.display = 'block';
+        document.getElementById('upload-container').style.display = 'none';
+    }
+
+    function showUpload() {
+        document.getElementById('canvas-container').style.display = 'none';
+        document.getElementById('upload-container').style.display = 'block';
+        document.getElementById('btn-clear').style.display = 'none';
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('btn-clear').style.display = 'none';
+    }
+
+    document.getElementById('solicitud-form').addEventListener('submit', () => {
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        if (canvas.toDataURL() !== blank.toDataURL()) {
+            document.getElementById('firma-data').value = canvas.toDataURL('image/png');
+        }
+    });
+</script>
+{% endblock %}
